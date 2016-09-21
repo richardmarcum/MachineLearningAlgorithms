@@ -1,1 +1,6 @@
 # MachineLearningAlgorithms
+
+## Algorithms
+ 
+ * Multilayer Perceptron
+ 
