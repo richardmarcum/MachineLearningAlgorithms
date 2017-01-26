@@ -15,7 +15,7 @@ def NumberCorrect(Prediction, TrueValues):
 	return numCorrect
 
 class ActivationFunction:
-	
+
 	def Sigmoid(x, Derivative=False):
 		output = expit(x)
 		if not Derivative:
@@ -38,7 +38,7 @@ class ActivationFunction:
 	def Softmax(x, Derivative=False):
 		output = np.exp(x) / np.sum(np.exp(x))
 		if not Derivative:
-			
+
 			return output
 		else:
 			Size=x.shape[1]
@@ -52,12 +52,10 @@ class ActivationFunction:
 			return J
 
 
-
-
-
 class MultiLayerPerceptron:
 
-	def __init__(self, Dimensions, layerActivations, learningRate=0.1, momentum=0.3, regularizer=0.25):
+	def __init__(self, Dimensions, layerActivations, learningRate=0.1,
+					momentum=0.3, regularizer=0.25):
 
 		self.layerFlist = layerActivations
 		self.layerCount = len(Dimensions) - 1
@@ -73,8 +71,6 @@ class MultiLayerPerceptron:
 		self.regularizer = regularizer
 
 		self.local_grad = []
-
-
 
 		for i in range(self.layerCount):
 			if i == (self.layerCount-1):
@@ -118,7 +114,7 @@ class MultiLayerPerceptron:
 				self.layerOutput.append(y)
 			else:
 				v = (self.weights[location] @ self.layerOutput[-1] )
-				#v[0]=1							
+				#v[0]=1
 				y = self.layerFlist[location](v)
 				self.layerInput.append(v)
 				self.layerOutput.append(y)
@@ -132,11 +128,11 @@ class MultiLayerPerceptron:
 		Input = np.array(Input).reshape((self.shape[0],1))
 		NumInputs = Input.shape[1]
 		self.ForwardPass(Input)
-		weightDelta = []		
-		
+		weightDelta = []
+
 		#This for loop computes all of the local gradients
 		for index in reversed(range(self.layerCount)):
-			
+
 			if index == self.layerCount - 1:
 
 				error_signal = labels - self.layerOutput[index]
@@ -144,7 +140,7 @@ class MultiLayerPerceptron:
 				# print(labels.shape)
 				# print(error_signal.shape)
 
-				delta = (error_signal * 
+				delta = (error_signal *
 					self.layerFlist[index](self.layerInput[index], Derivative=True))
 
 				self.local_grad.append(delta)
@@ -152,8 +148,8 @@ class MultiLayerPerceptron:
 			else:
 				#print(index)
 				#print(self.layerCount-1-index)
-				first = self.layerFlist[index](self.layerInput[index], Derivative=True) 				
-				second = (self.weights[index+1].T 
+				first = self.layerFlist[index](self.layerInput[index], Derivative=True)
+				second = (self.weights[index+1].T
 							@ self.local_grad[(self.layerCount - 1) - (index + 1)])
 				delta = first * second
 				self.local_grad.append(delta)
@@ -161,28 +157,28 @@ class MultiLayerPerceptron:
 		#This for loop uses all of the local gradients to compute the weight
 		#update matrices.
 		for index in range(self.layerCount):
-			
+
 			if index == 0:
 
 				Input = np.vstack((np.ones((1,NumInputs)),Input))
 				weightDelta.append(self.local_grad[self.layerCount-1-index] @ Input.T)
-			
+
 			else:
 
-				weightDelta.append(self.local_grad[self.layerCount-1-index] 
+				weightDelta.append(self.local_grad[self.layerCount-1-index]
 												@ self.layerOutput[index-1].T)
 
-		
-		error = np.sum(error_signal ** 2)	
-		
+
+		error = np.sum(error_signal ** 2)
+
 		#this computes all of the weight delta matrices and if the batch flag is triggered
 		#it will return the weightDelta matrix so they can be averaged and applied all at once
 		# in the batch train method below.
 
 		if batch == True:
-			
+
 			return weightDelta,error
-		
+
 		else:
 			for i in range(len(self.weights)):
 				self.weights[i] = self.weights[i] + self.learningRate * self.momentum * self.oldWeightDelta[i] + self.learningRate * weightDelta[i] - self.regularizer * self.learningRate * self.weights[i]
@@ -207,7 +203,7 @@ class MultiLayerPerceptron:
 
 			for j in range(self.layerCount):
 				AccumulatedWeightChange[j] = AccumulatedWeightChange[j] + currentWeightDelta[j]
-				
+
 		for i in range(len(self.weights)):
 			self.weights[i] = self.weights[i] + self.learningRate * self.momentum * self.oldAccumulatedWeightChange[i] + self.learningRate * AccumulatedWeightChange[i] - self.regularizer * self.learningRate * self.weights[i]
 			self.oldAccumulatedWeightChange = AccumulatedWeightChange[:]
@@ -219,7 +215,7 @@ class MultiLayerPerceptron:
 		numClasses = self.shape[-1]
 		classList = (1,2,3)
 		labelList = []
-		
+
 
 		for num in range(numClasses):
 			temp = np.zeros((numClasses,1))
@@ -229,14 +225,14 @@ class MultiLayerPerceptron:
 		cleanedLabels = []
 
 		for i in range(len(labels)):
-			
+
 			temp = labelList[int(labels[i][0]-1)]
 			cleanedLabels.append(temp)
-			
+
 		return cleanedLabels
 
 	def TrainEpoch(self, Data, Labels, numEpochs, BatchTrain=True):
-	
+
 
 		ErrorEpochList = []
 		#errorlist = []
@@ -265,7 +261,7 @@ class MultiLayerPerceptron:
 			#return errorlist
 				avgError = np.average(errorlist)
 				ErrorEpochList.append(avgError)
-				
+
 				if (num % 5) == 0:
 					print("The average error is {}".format(avgError))
 
@@ -282,14 +278,6 @@ class MultiLayerPerceptron:
 
 		return prediction
 
-
-
-
-
-
 if __name__ == "__main__":
 
 	print("You made it this far?")
-
-
-
